@@ -1,4 +1,7 @@
-import { DecimalBlock, StringBlock } from "../Block"
+import {
+  DecimalBlock,
+  StringBlock
+} from "../Block"
 import { DataFrame } from "../Frame"
 
 test('frames', () => {

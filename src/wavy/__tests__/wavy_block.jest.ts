@@ -1,5 +1,4 @@
 import {
-  DataBlock,
   DecimalBlock,
   StringBlock
 } from '../Block'

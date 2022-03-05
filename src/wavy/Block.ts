@@ -1,5 +1,8 @@
 import { Buffer } from 'buffer'
-import { Exclude, Expose } from 'class-transformer'
+import {
+  Exclude,
+  Expose
+} from 'class-transformer'
 
 export type UndefinableBuffer = Buffer | undefined
 

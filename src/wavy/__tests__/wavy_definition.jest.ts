@@ -1,16 +1,15 @@
-import { classToPlain, instanceToPlain, plainToClass } from 'class-transformer'
-
-import demoPj from './wavy_demo_definition.json'
-import {
-  DataFrame,
-  RefBlock,
-  WavyProject
-} from '../Frame'
+import { plainToClass } from 'class-transformer'
 import {
   DataBlock,
   DecimalBlock,
   StringBlock
 } from '../Block'
+import {
+  DataFrame,
+  RefBlock
+} from '../Frame'
+import { WavyProject } from '../WavyProject'
+import demoPj from './wavy_demo_definition.json'
 
 test('demo project', () => {
   let wavy: WavyProject = plainToClass(WavyProject, demoPj)
