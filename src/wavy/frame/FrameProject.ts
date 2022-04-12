@@ -19,7 +19,7 @@ import {
 
 type UndefinableWavyItem = WavyItem | undefined
 
-export class WavyProject {
+export class FrameProject {
   @Expose({ name: 'frames' })
   @Type(() => Object, {
     discriminator: {
@@ -91,5 +91,17 @@ export class WavyProject {
       return b.id === id
     })
     return b
+  }
+
+  clone(): FrameProject {
+    let cloned = new FrameProject(this.name)
+    cloned._frames = this._frames.map(f => {
+      return f.clone()
+    })
+    cloned._blocks = this._blocks.map(b => {
+      return b.clone()
+    })
+    cloned.injectProjectToRef()
+    return cloned
   }
 }

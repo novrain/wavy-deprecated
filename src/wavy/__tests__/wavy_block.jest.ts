@@ -1,7 +1,7 @@
 import {
   DecimalBlock,
   StringBlock
-} from '../Block'
+} from '../frame/Block'
 
 test('decimal bocks int8/uint8', () => {
   //
@@ -182,5 +182,3 @@ test('string bocks hex data as ascii string', () => {
   expect(buff!.length).toEqual(6)
   expect(buff!.toString()).toEqual('ABCDEF')
 })
-
-

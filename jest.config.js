@@ -3,4 +3,8 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  moduleFileExtensions: ["js", "json", "vue"],
+  transform: {
+    "^.+\\.vue$": "@vue/vue3-jest"
+  }
 };

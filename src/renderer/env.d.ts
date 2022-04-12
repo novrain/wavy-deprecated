@@ -8,6 +8,7 @@ declare module '*.vue' {
 }
 
 interface Window {
-  fs: typeof import('fs'),
+  // fs: typeof import('fs'),
+  // SerialPort: typeof import('serialport').SerialPort,
   ipcRenderer: import('electron').IpcRenderer
 }

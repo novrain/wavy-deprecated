@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": "src",
     "resolveJsonModule": true,
     "composite": true,
     "target": "esnext",
@@ -7,10 +8,11 @@
     "noImplicitAny": true,
     "strict": true,
     "sourceMap": true,
-    "outDir": "dist/main",
+    "outDir": "dist",
     "strictNullChecks": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
+    "suppressImplicitAnyIndexErrors": true,
     "baseUrl": ".",
     "paths": {
       "*": [

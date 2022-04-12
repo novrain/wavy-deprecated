@@ -1,8 +1,13 @@
-import { Buffer } from 'buffer'
+import { Buffer as NodeBuffer } from 'buffer'
 import {
   Exclude,
   Expose
 } from 'class-transformer'
+import { defaultId } from '../util/SnowflakeId'
+let Buffer = NodeBuffer
+if (!Buffer) {
+  Buffer = window.Buffer
+}
 
 export type UndefinableBuffer = Buffer | undefined
 
@@ -28,6 +33,7 @@ export interface Block {
   __type: BlockType
   encode(): UndefinableBuffer
   decode(raw: Buffer, offset: number): number
+  clone(): Block
 }
 
 export type UndefinableBlock = Block | undefined
@@ -189,6 +195,21 @@ export class DecimalBlock implements DataBlock {
   decode(raw: Buffer, offset: number): number {
     throw new Error('Method not implemented.')
   }
+
+  clone(): Block {
+    let clone = new DecimalBlock(
+      defaultId.nextId() + '',
+      this.name,
+      this.value,
+      this.numberType,
+      this.endian,
+      this.encoding,
+      this.padToLength,
+      this.padSide,
+      this.pad
+    )
+    return clone
+  }
 }
 
 //  十六进制 | Base64 | ASCII
@@ -231,5 +252,19 @@ export class StringBlock implements DataBlock {
 
   decode(raw: Buffer, offset: number): number {
     throw new Error('Method not implemented.')
+  }
+
+  clone(): Block {
+    let clone = new StringBlock(
+      defaultId.nextId() + '',
+      this.name,
+      this.value,
+      this.encoding,
+      this.endian,
+      this.padToLength,
+      this.padSide,
+      this.pad
+    )
+    return clone
   }
 }

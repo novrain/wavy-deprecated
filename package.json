@@ -4,7 +4,8 @@
   "version": "0.0.0",
   "scripts": {
     "vite:dev": "vite",
-    "vite:build": "vue-tsc --noEmit -p tsconfig.vite.json && vite build",
+    "vite:build": "vue-tsc --noEmit -p tsconfig.vite-cli.json && vite build",
+    "vite:tsc": "vue-tsc -p tsconfig.vite-cli.json",
     "vite:preview": "vite preview",
     "vite:lint": "eslint -c .vite.eslintrc.js ./src/renderer --ext .ts,.vue",
     "electron:build": "tsc -p tsconfig.electron.json",
@@ -13,16 +14,39 @@
     "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run vite:dev\" \"npm run electron:start\""
   },
   "dependencies": {
+    "@electron/remote": "^2.0.8",
+    "@serialport/binding-abstract": "^9.2.4",
     "class-transformer": "^0.5.1",
-    "element-plus": "^2.0.2",
+    "compare-versions": "^4.1.3",
+    "electron-debug": "^3.2.0",
+    "electron-store": "^8.0.1",
+    "element-plus": "^2.0.5",
+    "fs-extra": "^10.0.1",
+    "glasstron": "^0.1.1",
+    "js-yaml": "^4.1.0",
+    "macos-release": "^3.0.1",
+    "pinia": "^2.0.11",
     "reflect-metadata": "^0.1.13",
-    "vue": "^3.2.25"
+    "rxjs": "^7.5.5",
+    "serialport": "^10.4.0",
+    "stylus": "^0.56.0",
+    "vue": "^3.2.25",
+    "vue-router": "^4.0.13",
+    "winston": "^3.6.0",
+    "yargs": "^17.3.1"
+  },
+  "optionalDependencies": {
+    "@tabby-gang/windows-blurbehind": "^3.0.0",
+    "windows-native-registry": "^3.2.1"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "@types/js-yaml": "^4.0.5",
     "@typescript-eslint/eslint-plugin": "^5.12.1",
     "@typescript-eslint/parser": "^5.12.1",
     "@vitejs/plugin-vue": "^2.2.0",
+    "@vue/test-utils": "^2.0.0-rc.18",
+    "@vue/vue3-jest": "^27.0.0-alpha.4",
     "concurrently": "^7.0.0",
     "cross-env": "^7.0.3",
     "electron": "^17.1.0",

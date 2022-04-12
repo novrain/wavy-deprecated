@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "rootDir": "src",
-    "composite": true,
     "target": "esnext",
     "strictNullChecks": true,
+    "skipLibCheck": true,
     "useDefineForClassFields": true,
     "module": "esnext",
     "moduleResolution": "node",

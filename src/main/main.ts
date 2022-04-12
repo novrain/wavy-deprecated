@@ -1,49 +1,65 @@
-import { app, BrowserWindow } from "electron";
-import * as path from "path";
+import { app, ipcMain, Menu } from 'electron'
+import { parseArgs } from './cli'
+import { Application } from './app'
+import electronDebug = require('electron-debug')
 
-function createWindow() {
-  // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    height: 600,
-    webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
-    },
-    width: 800,
-  });
-  const isDev = process.env.IS_DEV == "true" ? true : false;
-  // and load the index.html of the app.
-  if (isDev) {
-    mainWindow.loadURL('http://localhost:3000')
-  }
-  else {
-    mainWindow.loadFile(path.join(__dirname, "../index.html"));
-  }
-
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+if (!process.env.TABBY_PLUGINS) {
+  process.env.TABBY_PLUGINS = ''
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on("ready", () => {
-  createWindow();
+const application = new Application()
 
-  app.on("activate", function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+ipcMain.on('app:new-window', () => {
+  application.newWindow()
+})
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    app.quit();
+app.on('activate', () => {
+  if (!application.hasWindows()) {
+    application.newWindow()
+  } else {
+    application.focus()
   }
-});
+})
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+process.on('uncaughtException' as any, (err: any) => {
+  console.log(err)
+  application.broadcast('uncaughtException', err)
+})
+
+app.on('second-instance', (_event, argv, cwd) => {
+  application.handleSecondInstance(argv, cwd)
+})
+
+const argv = parseArgs(process.argv, process.cwd())
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit()
+  app.exit(0)
+}
+
+if (argv.d) {
+  electronDebug({
+    isEnabled: true,
+    showDevTools: true,
+    devToolsMode: 'undocked',
+  })
+}
+
+app.on('ready', async () => {
+  if (process.platform === 'darwin') {
+    app.dock.setMenu(Menu.buildFromTemplate([
+      {
+        label: 'New window',
+        click() {
+          // this.app.newWindow()
+          application.newWindow()
+        },
+      },
+    ]))
+  }
+  application.init()
+
+  const window = await application.newWindow({ hidden: argv.hidden })
+  await window.ready
+  window.passCliArguments(process.argv, process.cwd(), false)
+})

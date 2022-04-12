@@ -3,16 +3,16 @@ import {
   DataBlock,
   DecimalBlock,
   StringBlock
-} from '../Block'
+} from '../frame/Block'
 import {
   DataFrame,
   RefBlock
-} from '../Frame'
-import { WavyProject } from '../WavyProject'
+} from '../frame/Frame'
+import { FrameProject } from '../frame/FrameProject'
 import demoPj from './wavy_demo_definition.json'
 
 test('demo project', () => {
-  let wavy: WavyProject = plainToClass(WavyProject, demoPj)
+  let wavy: FrameProject = plainToClass(FrameProject, demoPj)
   wavy.injectProjectToRef()
   expect(wavy).not.toBeUndefined()
   expect(wavy.name).toEqual(demoPj.name)

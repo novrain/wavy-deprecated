@@ -1,4 +1,4 @@
-import { Buffer } from "buffer"
+import { Buffer as NodeBuffer } from 'buffer'
 import {
   Expose,
   Type
@@ -12,32 +12,36 @@ import {
   UndefinableBlock,
   UndefinableBuffer
 } from "./Block"
-import { WavyProject } from './WavyProject'
+import { defaultId } from '../util/SnowflakeId'
+import { FrameProject } from './FrameProject'
+let Buffer = NodeBuffer
+if (!Buffer) {
+  Buffer = window.Buffer
+}
 
-
-type UndefinableWavyProject = WavyProject | undefined
+type UndefinableFrameProject = FrameProject | undefined
 
 export class RefBlock implements Block {
   __type: BlockType = 'Ref'
   _block?: Block
   _refId?: string
-  _project?: WavyProject
+  _project?: FrameProject
 
   constructor(
     readonly id: string,
     public name: string,
     refId?: string,
-    project?: WavyProject
+    project?: FrameProject
   ) {
     this._refId = refId
     this._project = project
   }
 
-  set project(v: UndefinableWavyProject) {
+  set project(v: UndefinableFrameProject) {
     this._project = v
   }
 
-  get project(): UndefinableWavyProject {
+  get project(): UndefinableFrameProject {
     return this._project
   }
 
@@ -69,6 +73,16 @@ export class RefBlock implements Block {
       return 0
     }
   }
+
+  clone(): Block {
+    let clone = new RefBlock(
+      defaultId.nextId() + '',
+      this.name,
+      this.refId,
+      this._project
+    )
+    return clone
+  }
 }
 
 export const BlockTransformer = Type(() => Object, {
@@ -87,8 +101,9 @@ type FrameType = 'Ref' | 'Data'
 export interface WavyItem {
   readonly id: string
   name: string
-  project?: WavyProject
+  project?: FrameProject
   injectProjectToRef(): void
+  clone(): WavyItem
 }
 
 export interface Frame extends WavyItem {
@@ -101,7 +116,7 @@ export type UndefinableFrame = Frame | undefined
 
 export class RefFrame implements Frame {
   _frame?: Frame
-  _project?: WavyProject
+  _project?: FrameProject
 
   @Expose({ name: 'refId' })
   _refId?: string
@@ -110,17 +125,17 @@ export class RefFrame implements Frame {
     readonly id: string,
     public name: string,
     refId?: string,
-    project?: WavyProject
+    project?: FrameProject
   ) {
     this._refId = refId
     this._project = project
   }
 
-  set project(v: UndefinableWavyProject) {
+  set project(v: UndefinableFrameProject) {
     this._project = v
   }
 
-  get project(): UndefinableWavyProject {
+  get project(): UndefinableFrameProject {
     return this._project
   }
 
@@ -165,6 +180,16 @@ export class RefFrame implements Frame {
       return 0
     }
   }
+
+  clone(): Frame {
+    let cloned = new RefFrame(
+      defaultId.nextId() + '',
+      this.refId,
+      this.name,
+      this._project
+    )
+    return cloned
+  }
 }
 
 export class DataFrame implements Frame {
@@ -181,14 +206,14 @@ export class DataFrame implements Frame {
   })
   @Expose({ name: 'responseFrame' })
   _responseFrame?: Frame
-  _project?: WavyProject
+  _project?: FrameProject
 
   constructor(
     readonly id: string,
     public name: string,
     blocks?: Block[],
     responseFrame?: Frame,
-    project?: WavyProject
+    project?: FrameProject
   ) {
     if (blocks) {
       this.blocks = blocks
@@ -201,11 +226,11 @@ export class DataFrame implements Frame {
     this.blocks.push(block)
   }
 
-  set project(v: UndefinableWavyProject) {
+  set project(v: UndefinableFrameProject) {
     this._project = v
   }
 
-  get project(): UndefinableWavyProject {
+  get project(): UndefinableFrameProject {
     return this._project
   }
 
@@ -245,6 +270,20 @@ export class DataFrame implements Frame {
   decodeByResponse(raw: Buffer, offset: number): number {
     return this.responseFrame.decode(raw, offset)
   }
+
+  clone(): Frame {
+    let cloned = new DataFrame(
+      defaultId.nextId() + '',
+      this.name
+    )
+    cloned.blocks = this.blocks.map(b => b.clone())
+    if (this._responseFrame) {
+      cloned._responseFrame = this._responseFrame.clone() as Frame
+    }
+    cloned._project = this._project
+    cloned.injectProjectToRef()
+    return cloned
+  }
 }
 
 type WavyItemType = FrameType | 'Suite'
@@ -263,13 +302,13 @@ export class Suite implements WavyItem {
   })
   @Expose({ name: 'frames' })
   _frames: WavyItem[] = []
-  _project?: WavyProject
+  _project?: FrameProject
 
   constructor(
     readonly id: string,
     public name: string,
     frames?: WavyItem[],
-    project?: WavyProject
+    project?: FrameProject
   ) {
     if (frames) {
       this._frames = frames
@@ -278,12 +317,12 @@ export class Suite implements WavyItem {
     }
   }
 
-  set project(v: UndefinableWavyProject) {
+  set project(v: UndefinableFrameProject) {
     this._project = v
     this.injectProjectToRef()
   }
 
-  get project(): UndefinableWavyProject {
+  get project(): UndefinableFrameProject {
     return this._project
   }
 
@@ -297,5 +336,16 @@ export class Suite implements WavyItem {
 
   addFrame(frame: WavyItem): void {
     this._frames.push(frame)
+  }
+
+  clone(): WavyItem {
+    let cloned = new Suite(
+      defaultId.nextId() + '',
+      this.name,
+    )
+    cloned._frames = this._frames.map(f => f.clone())
+    cloned._project = this._project
+    cloned.injectProjectToRef()
+    return cloned
   }
 }
